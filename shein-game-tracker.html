@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shein Game Tracker</title>
+    <style>
+        :root {
+            --primary: #ec4899;
+            --primary-dark: #be185d;
+            --secondary: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a252f;
+        }
+
+        .game-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .game-table th {
+            background-color: var(--secondary);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .game-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .game-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        .custom-checkbox {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            position: relative;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .custom-checkbox.checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .custom-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 1rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .report {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .report h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .report-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .report-section h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .status-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+        }
+
+        .status-dot.complete {
+            background-color: #10b981;
+        }
+
+        .status-dot.pending {
+            background-color: #f59e0b;
+        }
+
+        .player-list {
+            list-style-position: inside;
+            color: #4b5563;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .modal-close:hover {
+            color: #1f2937;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🛍️ Shein Game Tracker</h1>
+            <p>Suivez votre progression dans les mini-jeux Shein</p>
+        </header>
+
+        <main class="main-content">
+            <div class="actions">
+                <button class="btn btn-secondary" id="resetBtn">
+                    🔄 Réinitialiser
+                </button>
+                <button class="btn btn-primary" id="addPlayerBtn">
+                    👤 Ajouter un joueur
+                </button>
+            </div>
+
+            <table class="game-table">
+                <thead>
+                    <tr>
+                        <th>Pseudo 👤</th>
+                        <th>Violet 💜</th>
+                        <th>Vert 💚</th>
+                        <th>Orange 🧡</th>
+                        <th>Arbre 🌳</th>
+                        <th>Noir 🖤</th>
+                        <th>Bloquer ❌</th>
+                    </tr>
+                </thead>
+                <tbody id="playerTableBody">
+                </tbody>
+            </table>
+        </main>
+
+        <section class="report">
+            <h2>Rapport</h2>
+            <div class="report-section">
+                <h3><span class="status-dot complete"></span> Ont complété tous les défis</h3>
+                <ul class="player-list" id="completedList"></ul>
+            </div>
+            <div class="report-section">
+                <h3><span class="status-dot pending"></span> En cours</h3>
+                <ul class="player-list" id="pendingList"></ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal" id="addPlayerModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h2>Ajouter un nouveau joueur</h2>
+            <form id="addPlayerForm">
+                <div class="form-group">
+                    <label class="form-label" for="playerPseudo">Pseudo</label>
+                    <input type="text" id="playerPseudo" class="form-input" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class GameTracker {
+            constructor() {
+                this.players = [
+                    {
+                        pseudo: "Jordan J***4",
+                        statuses: { violet: false, vert: false, orange: false, arbre: false, noir: false, bloquer: false }
+                    },
+                    {
+                        pseudo: "Angelique G***5 / A***n",
+                        statuses: { violet: false, vert: false, orange: false, arbre: false, noir: false, bloquer: false }
+                    }
+                ];
+
+                this.initializeElements();
+                this.bindEvents();
+                this.render();
+            }
+
+            initializeElements() {
+                this.tableBody = document.getElementById('playerTableBody');
+                this.completedList = document.getElementById('completedList');
+                this.pendingList = document.getElementById('pendingList');
+                this.modal = document.getElementById('addPlayerModal');
+                this.addPlayerForm = document.getElementById('addPlayerForm');
+            }
+
+            bindEvents() {
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetAll());
+                document.getElementById('addPlayerBtn').addEventListener('click', () => this.openModal());
+                document.getElementById('closeModal').addEventListener('click', () => this.closeModal());
+                this.addPlayerForm.addEventListener('submit', (e) => this.handleAddPlayer(e));
+            }
+
+            render() {
+                this.renderTable();
+                this.renderReport();
+            }
+
+            renderTable() {
+                this.tableBody.innerHTML = this.players.map((player, playerIndex) => `
+                    <tr>
+                        <td>${player.pseudo}</td>
+                        ${Object.entries(player.statuses).map(([status, checked], statusIndex) => `
+                            <td class="checkbox-wrapper">
+                                <div class="custom-checkbox ${checked ? 'checked' : ''}"
+                                     onclick="gameTracker.toggleStatus(${playerIndex}, '${status}')"></div>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+
+            renderReport() {
+                const { completed, pending } = this.players.reduce((acc, player) => {
+                    const isCompleted = Object.values(player.statuses).every(status => status);
+                    if (isCompleted) {
+                        acc.completed.push(player.pseudo);
+                    } else {
+                        acc.pending.push(player.pseudo);
+                    }
+                    return acc;
+                }, { completed: [], pending: [] });
+
+                this.completedList.innerHTML = completed.length
+                    ? completed.map(pseudo => `<li>${pseudo}</li>`).join('')
+                    : '<li class="text-gray-500 italic">Aucun joueur n\'a encore terminé</li>';
+
+                this.pendingList.innerHTML = pending.map(pseudo => `<li>${pseudo}</li>`).join('');
+            }
+
+            toggleStatus(playerIndex, status) {
+                this.players[playerIndex].statuses[status] = !this.players[playerIndex].statuses[status];
+                this.render();
+            }
+
+            resetAll() {
+                this.players = this.players.map(player => ({
+                    ...player,
+                    statuses: Object.keys(player.statuses).reduce((acc, key) => ({
+                        ...acc,
+                        [key]: false
+                    }), {})
+                }));
+                this.render();
+            }
+
+            openModal() {
+                this.modal.classList.add('active');
+            }
+
+            closeModal() {
+                this.modal.classList.remove('active');
+                this.addPlayerForm.reset();
+            }
+
+            handleAddPlayer(e) {
+                e.preventDefault();
+                const pseudo = document.getElementById('playerPseudo').value.trim();
+                if (pseudo) {
+                    this.players.push({
+                        pseudo,
+                        statuses: { violet: false, vert: false, orange: false, arbre: false, noir: false, bloquer: false }
+                    });
+                    this.render();
+                    this.closeModal();
+                }
+            }
+        }
+
+        const gameTracker = new GameTracker();
+    </script>
+</body>
+</html>
